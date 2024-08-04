@@ -26,3 +26,5 @@ export const post = pgTable('post', {
 	createdAt: timestamp('created_at', { mode: 'string' }).notNull().defaultNow(),
 	updatedAt: timestamp('updated_at', { mode: 'string' }).notNull().defaultNow(),
 });
+
+// export const postRelations = relations(post, ({ one }) => {});
