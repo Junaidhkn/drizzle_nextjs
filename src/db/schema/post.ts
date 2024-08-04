@@ -11,6 +11,8 @@ import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
 import { category, user } from '@/db/schema';
+import { postTags } from './postTags';
+import { comment } from './comments';
 
 export const post = pgTable('post', {
 	id: serial('id').primaryKey(),
@@ -27,4 +29,15 @@ export const post = pgTable('post', {
 	updatedAt: timestamp('updated_at', { mode: 'string' }).notNull().defaultNow(),
 });
 
-// export const postRelations = relations(post, ({ one }) => {});
+export const postRelations = relations(post, ({ one, many }) => ({
+	user: one(user, {
+		fields: [post.userId],
+		references: [user.id],
+	}),
+	tags: many(postTags),
+	comments: many(comment),
+	category: one(category, {
+		fields: [post.categoryId],
+		references: [category.id],
+	}),
+}));
