@@ -1,71 +1,84 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { useRouter } from 'next/navigation';
+import { SubmitHandler, useForm } from 'react-hook-form';
 
 import {
 	createPost,
 	updatePost,
-} from "@/app/(admin)/admin/posts/create/actions";
-import { Input } from "@/components/form-controllers/input";
-import SelectBox from "@/components/form-controllers/select-box";
-import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
-import { toast } from "@/components/ui/use-toast";
+} from '@/app/(admin)/admin/posts/create/actions';
+import { Input } from '@/components/form-controllers/input';
+import SelectBox from '@/components/form-controllers/select-box';
+import { Button } from '@/components/ui/button';
+import { Form } from '@/components/ui/form';
+import { toast } from '@/components/ui/use-toast';
+import { postSchema, PostSchema } from '@/db/schema/post';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 type Props = {
-	defaultValues: any;
+	defaultValues: PostSchema;
 	categoriesData: { id: number; name: string }[] | null;
 	tagsData: { id: number; name: string }[] | null;
 };
 export function PostForm({ defaultValues, categoriesData, tagsData }: Props) {
 	const router = useRouter();
 
-	const form = useForm<any>({
+	const form = useForm<PostSchema>({
+		resolver: zodResolver(postSchema),
 		defaultValues,
 	});
 
-	const onSubmit: SubmitHandler<any> = async (data) => {
+	const onSubmit: SubmitHandler<PostSchema> = async (data) => {
 		let response;
-		if (data.mode === "create") {
+		if (data.mode === 'create') {
 			response = await createPost(data);
 		} else {
 			response = await updatePost(data);
 		}
 		toast({
 			title: response.message,
-			variant: response.success === true ? "default" : "destructive",
+			variant: response.success === true ? 'default' : 'destructive',
 		});
-		router.push("/admin/posts");
+		router.push('/admin/posts');
 	};
 
 	return (
 		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-				<Input control={form.control} name="title" label="Title" />
+			<form
+				onSubmit={form.handleSubmit(onSubmit)}
+				className='space-y-6'>
 				<Input
 					control={form.control}
-					name="shortDescription"
-					label="Short description"
+					name='title'
+					label='Title'
 				/>
-				<Input control={form.control} name="content" label="Content" />
+				<Input
+					control={form.control}
+					name='shortDescription'
+					label='Short description'
+				/>
+				<Input
+					control={form.control}
+					name='content'
+					label='Content'
+				/>
 
 				<SelectBox
 					options={categoriesData}
 					control={form.control}
-					name="categoryId"
-					label="Category"
+					name='categoryId'
+					label='Category'
 				/>
 
 				<SelectBox
 					options={tagsData}
 					control={form.control}
-					name="tagIds"
+					name='tagIds'
 					multiple
-					label="Tags"
+					label='Tags'
 				/>
 
-				<Button type="submit">Submit</Button>
+				<Button type='submit'>Submit</Button>
 			</form>
 		</Form>
 	);
