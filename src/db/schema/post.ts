@@ -1,4 +1,4 @@
-import { relations } from 'drizzle-orm';
+import { InferSelectModel, relations } from 'drizzle-orm';
 import {
 	integer,
 	pgTable,
@@ -11,6 +11,8 @@ import {
 import { category, user } from '@/db/schema';
 import { postTags } from './postTags';
 import { comment } from './comments';
+import { createInsertSchema } from 'drizzle-zod';
+import { z } from 'zod';
 
 export const post = pgTable('post', {
 	id: serial('id').primaryKey(),
@@ -39,3 +41,41 @@ export const postRelations = relations(post, ({ one, many }) => ({
 		references: [category.id],
 	}),
 }));
+
+const baseSchema = createInsertSchema(post, {
+	title: (schema) => schema.title.min(1),
+	shortDescription: (schema) => schema.shortDescription.min(1).max(255),
+	userId: (schema) => schema.userId.min(1),
+	categoryId: (schema) => schema.categoryId.min(1),
+}).pick({
+	title: true,
+	shortDescription: true,
+	userId: true,
+	categoryId: true,
+	content: true,
+});
+
+export const postSchema = z.union([
+	z.object({
+		mode: z.literal('create'),
+		title: baseSchema.shape.title,
+		shortDescription: baseSchema.shape.shortDescription,
+		userId: baseSchema.shape.userId,
+		categoryId: baseSchema.shape.categoryId,
+		content: baseSchema.shape.content,
+		tagIds: z.array(z.number()),
+	}),
+	z.object({
+		mode: z.literal('edit'),
+		id: z.number().min(1),
+		title: baseSchema.shape.title,
+		shortDescription: baseSchema.shape.shortDescription,
+		userId: baseSchema.shape.userId,
+		categoryId: baseSchema.shape.categoryId,
+		content: baseSchema.shape.content,
+		tagIds: z.array(z.number()),
+	}),
+]);
+
+export type PostSchema = z.infer<typeof postSchema>;
+export type SelectPostModel = InferSelectModel<typeof post>;
