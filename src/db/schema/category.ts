@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm';
-import { pgTable, PgUUID, serial, uuid, varchar } from 'drizzle-orm/pg-core';
+import { pgTable, serial, uuid, varchar } from 'drizzle-orm/pg-core';
 import { post } from '@/db/schema/post';
 
 export const category = pgTable('category', {
