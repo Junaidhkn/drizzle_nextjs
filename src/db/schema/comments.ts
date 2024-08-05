@@ -10,6 +10,8 @@ import {
 import { post } from '@/db/schema/post';
 import { user } from '@/db/schema';
 import { relations } from 'drizzle-orm';
+import { createInsertSchema } from 'drizzle-zod';
+import { z } from 'zod';
 
 export const comment = pgTable('comment', {
 	id: serial('id').primaryKey(),
@@ -33,3 +35,17 @@ export const commentRelations = relations(comment, ({ one }) => ({
 		references: [post.id],
 	}),
 }));
+
+export const commentSchema = createInsertSchema(comment, {
+	postId: (schema) => schema.postId.min(1),
+	content: (schema) => schema.content.min(1),
+	userId: (schema) => schema.userId.min(1),
+}).pick({
+	postId: true,
+	content: true,
+	parentId: true,
+	userId: true,
+	id: true,
+});
+
+export type CommentSchema = z.infer<typeof commentSchema>;
