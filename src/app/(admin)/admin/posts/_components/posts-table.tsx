@@ -1,14 +1,14 @@
-import { EllipsisVertical, Eye, Pencil } from "lucide-react";
-import Link from "next/link";
+import { EllipsisVertical, Eye, Pencil } from 'lucide-react';
+import Link from 'next/link';
 
-import { DeletePostButton } from "@/app/(admin)/admin/posts/_components/delete-post-button";
-import { getCategories } from "@/app/queries";
-import { Button } from "@/components/ui/button";
+import { DeletePostButton } from '@/app/(admin)/admin/posts/_components/delete-post-button';
+import { getCategories } from '@/app/queries';
+import { Button } from '@/components/ui/button';
 import {
 	Popover,
 	PopoverContent,
 	PopoverTrigger,
-} from "@/components/ui/popover";
+} from '@/components/ui/popover';
 import {
 	Table,
 	TableBody,
@@ -16,10 +16,11 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
+import { SelectPostModel } from '@/db/schema/post';
 
 type Props = {
-	rows: any[] | null;
+	rows: SelectPostModel[] | null;
 	columns: string[];
 };
 export async function PostsTable({ rows, columns }: Props) {
@@ -37,15 +38,15 @@ export async function PostsTable({ rows, columns }: Props) {
 			<TableBody>
 				{(rows || []).map((row) => (
 					<TableRow key={row.id}>
-						<TableCell className="font-medium">{row.id}</TableCell>
-						<TableCell className="font-medium">{row.title}</TableCell>
-						<TableCell className="font-medium">
+						<TableCell className='font-medium'>{row.id}</TableCell>
+						<TableCell className='font-medium'>{row.title}</TableCell>
+						<TableCell className='font-medium'>
 							{row.shortDescription}
 						</TableCell>
-						<TableCell className="font-medium">
+						<TableCell className='font-medium'>
 							{
 								categoriesData.find(
-									(category) => category.id === row.categoryId
+									(category) => category.id === row.categoryId,
 								)?.name
 							}
 						</TableCell>
@@ -54,16 +55,20 @@ export async function PostsTable({ rows, columns }: Props) {
 								<PopoverTrigger>
 									<EllipsisVertical />
 								</PopoverTrigger>
-								<PopoverContent className="flex flex-col items-start w-fit">
-									<Button variant="ghost" asChild>
+								<PopoverContent className='flex flex-col items-start w-fit'>
+									<Button
+										variant='ghost'
+										asChild>
 										<Link href={`/admin/posts/${row.id}`}>
-											<Pencil className="mr-2 h-4 w-4" />
+											<Pencil className='mr-2 h-4 w-4' />
 											Edit
 										</Link>
 									</Button>
-									<Button variant="ghost" asChild>
+									<Button
+										variant='ghost'
+										asChild>
 										<Link href={`/posts/${row.id}`}>
-											<Eye className="mr-2 h-4 w-4" />
+											<Eye className='mr-2 h-4 w-4' />
 											View
 										</Link>
 									</Button>
